@@ -1,0 +1,24 @@
+{
+  "name": "stater",
+  "version": "1.0.0",
+  "description": "for a quick start  a new front project",
+  "main": "gulp.js",
+  "scripts": {
+    "test": "https://github.com/morqan/stater.git"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morqan/stater.git"
+  },
+  "author": "Qurbanov Murad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/morqan/stater/issues"
+  },
+  "homepage": "https://github.com/morqan/stater#readme",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2"
+  }
+}
