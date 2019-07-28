@@ -5,7 +5,8 @@ const rename = require('gulp-rename');
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
-// const minify = require('gulp-minify');
+const concat = require('gulp-concat');
+const uglify = require('gulp-uglify');
 const minifyCSS = require('gulp-minify-css');
 const browserSync = require('browser-sync').create();
 
@@ -31,6 +32,19 @@ function cssProcessing(callback){
 
 gulp.task(cssProcessing);
 
+function jsProcessing(callback){
+    gulp.src('./development/js/**/*.js')
+    .pipe(concat('all.js'))
+    .pipe(gulp.dest('./prodaction/js/'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./prodaction/js/'))
+
+    callback();
+}
+
+gulp.task(jsProcessing);
+
+
 function liveServer(callback) {
     browserSync.init({
         server: {
@@ -41,7 +55,7 @@ function liveServer(callback) {
     callback();
 }
 
-
+gulp.task(liveServer);
 
 function watchProcessing(){
     gulp.watch("./development/sass/**/*",cssProcessing);
@@ -50,4 +64,3 @@ function watchProcessing(){
 
 gulp.task('default', gulp.series(cssProcessing,watchProcessing));
 
-gulp.task(liveServer);
