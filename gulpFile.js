@@ -8,6 +8,7 @@ const autoprefixer = require('gulp-autoprefixer');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const minifyCSS = require('gulp-minify-css');
+const imagemin = require('gulp-imagemin');
 const browserSync = require('browser-sync').create();
 
 function cssProcessing(callback){
@@ -44,6 +45,25 @@ function jsProcessing(callback){
 
 gulp.task(jsProcessing);
 
+function imageProcessing(callback){
+    gulp.src('./development/images/**/*')
+    .pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({
+            plugins: [
+                {removeViewBox: true},
+                {cleanupIDs: false}
+            ]
+        })
+    ]))
+    .pipe(gulp.dest('./prodaction/images/'))
+
+    callback();
+}
+
+gulp.task(imageProcessing);
 
 function liveServer(callback) {
     browserSync.init({
