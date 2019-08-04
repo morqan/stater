@@ -9,7 +9,11 @@ const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const minifyCSS = require('gulp-minify-css');
 const imagemin = require('gulp-imagemin');
+const rigger = require('gulp-rigger');
 const browserSync = require('browser-sync').create();
+
+
+
 
 function cssProcessing(callback){
     
@@ -65,6 +69,16 @@ function imageProcessing(callback){
 
 gulp.task(imageProcessing);
 
+function htmlProcessing(callback){
+    gulp.src('./development/*.html')
+    .pipe(rigger())
+    .pipe(gulp.dest('./prodaction/'))
+
+    callback();
+}
+
+gulp.task(htmlProcessing);
+
 function liveServer(callback) {
     browserSync.init({
         server: {
@@ -79,6 +93,8 @@ gulp.task(liveServer);
 
 function watchProcessing(){
     gulp.watch("./development/sass/**/*",cssProcessing);
+    gulp.watch("./development/js/**/*",jsProcessing);
+    gulp.watch("./development/images/**/*",imageProcessing);
 }
 
 
