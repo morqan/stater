@@ -13,6 +13,14 @@ const rigger = require('gulp-rigger');
 const rev_append = require('gulp-rev-append');
 const rev = require('gulp-rev');
 const revCollector = require('gulp-rev-collector');
+const gutil = require('gulp-util');
+const rimraf = require('rimraf');
+const revOutdated = require('gulp-rev-outdated');
+const path = require('path');
+const through = require('through2');
+
+
+
 const browserSync = require('browser-sync').create();
 
 
@@ -66,6 +74,8 @@ gulp.task('revCollector', function () {
         .pipe( gulp.dest('dist') );
 });
 
+
+
 function imageProcessing(callback){
     gulp.src('./development/images/**/*')
     .pipe(imagemin([
@@ -101,17 +111,28 @@ function htmlProcessing(callback){
 
 gulp.task(htmlProcessing);
 
-function cashProcessing(callback){
-    gulp.src('./prodaction/index.html')
-    .pipe(rev_append())
-    .pipe(gulp.dest('./prodaction/'))
+
+function cleaner() {
+    return through.obj(function(file, enc, cb){
+        rimraf( path.resolve( (file.cwd || process.cwd()), file.path), function (err) {
+            if (err) {
+                this.emit('error', new gutil.PluginError('Cleanup old files', err));
+            }
+            this.push(file);
+            cb();
+        }.bind(this));
+    });
+}
+
+function cleanProcessing(callback) {
+    gulp.src( ['./prodaction/css/*.*'], {read: false})
+        .pipe( revOutdated(1) ) // leave 1 latest asset file for every file name prefix.
+        .pipe( cleaner() )
 
     callback();
 }
 
-gulp.task(cashProcessing);
-
-  
+gulp.task(cleanProcessing);
 
 function liveServer(callback) {
     browserSync.init({
