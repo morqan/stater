@@ -10,6 +10,7 @@ const uglify = require('gulp-uglify');
 const minifyCSS = require('gulp-minify-css');
 const imagemin = require('gulp-imagemin');
 const rigger = require('gulp-rigger');
+const rev_append = require('gulp-rev-append');
 const browserSync = require('browser-sync').create();
 
 
@@ -29,6 +30,7 @@ function cssProcessing(callback){
     .pipe(minifyCSS())
     .pipe(rename({suffix: '.min'}))
     .pipe(sourcemaps.write())
+   
     .pipe(gulp.dest('./prodaction/css/'))
     .pipe(browserSync.stream());
      
@@ -71,13 +73,27 @@ gulp.task(imageProcessing);
 
 function htmlProcessing(callback){
     gulp.src('./development/*.html')
+    .pipe(rev_append())
     .pipe(rigger())
+    .pipe(rev_append())
     .pipe(gulp.dest('./prodaction/'))
 
     callback();
 }
 
 gulp.task(htmlProcessing);
+
+function cashProcessing(callback){
+    gulp.src('./prodaction/index.html')
+    .pipe(rev_append())
+    .pipe(gulp.dest('./prodaction/'))
+
+    callback();
+}
+
+gulp.task(cashProcessing);
+
+  
 
 function liveServer(callback) {
     browserSync.init({
