@@ -11,6 +11,8 @@ const minifyCSS = require('gulp-minify-css');
 const imagemin = require('gulp-imagemin');
 const rigger = require('gulp-rigger');
 const rev_append = require('gulp-rev-append');
+const rev = require('gulp-rev');
+const revCollector = require('gulp-rev-collector');
 const browserSync = require('browser-sync').create();
 
 
@@ -29,9 +31,11 @@ function cssProcessing(callback){
     .pipe(gulp.dest('./prodaction/css/'))
     .pipe(minifyCSS())
     .pipe(rename({suffix: '.min'}))
+    .pipe(rev())
     .pipe(sourcemaps.write())
-   
     .pipe(gulp.dest('./prodaction/css/'))
+    .pipe( rev.manifest() )
+    .pipe( gulp.dest( 'development/manifest/css/' ))
     .pipe(browserSync.stream());
      
     callback();
@@ -50,6 +54,17 @@ function jsProcessing(callback){
 }
 
 gulp.task(jsProcessing);
+
+
+
+gulp.task('revCollector', function () {
+    return gulp.src(['development/manifest/**/*.json', 'development/templates/**/*.html'])
+        .pipe( revCollector({
+            replaceReved: true
+        }))
+     
+        .pipe( gulp.dest('dist') );
+});
 
 function imageProcessing(callback){
     gulp.src('./development/images/**/*')
@@ -72,10 +87,13 @@ function imageProcessing(callback){
 gulp.task(imageProcessing);
 
 function htmlProcessing(callback){
+
+    gulp.src(['development/manifest/**/*.json', 'development/template/*.html'])
+    .pipe( revCollector({replaceReved: true}))
+    .pipe( gulp.dest('development/template') )
+
     gulp.src('./development/*.html')
-    .pipe(rev_append())
     .pipe(rigger())
-    .pipe(rev_append())
     .pipe(gulp.dest('./prodaction/'))
 
     callback();
@@ -111,6 +129,7 @@ function watchProcessing(){
     gulp.watch("./development/sass/**/*",cssProcessing);
     gulp.watch("./development/js/**/*",jsProcessing);
     gulp.watch("./development/images/**/*",imageProcessing);
+    gulp.watch("./development/*.html",htmlProcessing);
 }
 
 
