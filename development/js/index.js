@@ -1,1 +1,3 @@
-sdfsdfsfdgsdf
+$ (function () {
+    console.log('worksxfg');
+});

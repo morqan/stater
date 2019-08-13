@@ -18,10 +18,10 @@ const rimraf = require('rimraf');
 const revOutdated = require('gulp-rev-outdated');
 const path = require('path');
 const through = require('through2');
-
-
+const wiredep = require('wiredep').stream;
 
 const browserSync = require('browser-sync').create();
+
 
 
 
@@ -55,9 +55,14 @@ function jsProcessing(callback){
     gulp.src('./development/js/**/*.js')
     .pipe(concat('all.js'))
     .pipe(gulp.dest('./prodaction/js/'))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(rev())
     .pipe(uglify())
+    
     .pipe(gulp.dest('./prodaction/js/'))
-
+    .pipe( rev.manifest() )
+    .pipe( gulp.dest( 'development/manifest/js/' ))
+    .pipe(browserSync.stream());
     callback();
 }
 
@@ -65,14 +70,14 @@ gulp.task(jsProcessing);
 
 
 
-gulp.task('revCollector', function () {
-    return gulp.src(['development/manifest/**/*.json', 'development/templates/**/*.html'])
-        .pipe( revCollector({
-            replaceReved: true
-        }))
+// gulp.task('revCollector', function () {
+//     return gulp.src(['development/manifest/**/*.json', 'development/templates/**/*.html'])
+//         .pipe( revCollector({
+//             replaceReved: true
+//         }))
      
-        .pipe( gulp.dest('dist') );
-});
+//         .pipe( gulp.dest('dist') );
+// });
 
 
 
@@ -99,13 +104,20 @@ gulp.task(imageProcessing);
 function htmlProcessing(callback){
 
     gulp.src(['development/manifest/**/*.json', 'development/template/*.html'])
-    .pipe( revCollector({replaceReved: true}))
+    .pipe( revCollector({
+        replaceReved: true
+    
+    }))
     .pipe( gulp.dest('development/template') )
 
     gulp.src('./development/*.html')
     .pipe(rigger())
-    .pipe(gulp.dest('./prodaction/'))
-
+    .pipe(wiredep({
+        directory:"development/bower_components/main"
+       
+      }))
+    .pipe(gulp.dest('./prodaction'))
+    .pipe(browserSync.stream());
     callback();
 }
 
@@ -134,6 +146,17 @@ function cleanProcessing(callback) {
 
 gulp.task(cleanProcessing);
 
+function bowerProcessing(callback) {
+    gulp.src( 'prodaction/template/*.html')
+        .pipe(wiredep({
+        directory:"development/bower_components"
+      }))
+      .pipe(gulp.dest('development/template'));
+    callback();
+}
+
+gulp.task(bowerProcessing);
+
 function liveServer(callback) {
     browserSync.init({
         server: {
@@ -145,14 +168,20 @@ function liveServer(callback) {
 }
 
 gulp.task(liveServer);
+gulp.task('css', ['cssProcessing', 'htmlProcessing']);
+gulp.task('js', ['jsProcessing', 'htmlProcessing']);
+// gulp.task(css,gulp.series(cssProcessing,htmlProcessing));
+// gulp.task(js,gulp.series(jsProcessing,htmlProcessing));
+gulp.task('default', gulp.series(cssProcessing,jsProcessing,imageProcessing,htmlProcessing,bowerProcessing,watchProcessing));
+// gulp.task('default', gulp.parallel(liveServer,start));
+
+
 
 function watchProcessing(){
     gulp.watch("./development/sass/**/*",cssProcessing);
     gulp.watch("./development/js/**/*",jsProcessing);
     gulp.watch("./development/images/**/*",imageProcessing);
     gulp.watch("./development/*.html",htmlProcessing);
+    gulp.watch('bower.json',bowerProcessing);
 }
-
-
-gulp.task('default', gulp.series(cssProcessing,watchProcessing));
 
