@@ -1,6 +1,6 @@
 'use strict'
+const { gulp, src, dest, parallel, series,watch } = require('gulp');
 
-const gulp = require('gulp');
 const rename = require('gulp-rename');
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
@@ -22,106 +22,118 @@ const wiredep = require('wiredep').stream;
 
 const browserSync = require('browser-sync').create();
 
-
-
-
-
-function cssProcessing(callback){
-    
-    gulp.src('./development/sass/main.scss')
-    .pipe(sourcemaps.init())
-    .pipe(sass({
-        errorLogToConsole:true,
-        // outputStyle: 'compressed'
-    }))
-    .on('error',console.error.bind(console))
-    .pipe(autoprefixer(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true }))
-    .pipe(gulp.dest('./prodaction/css/'))
-    .pipe(minifyCSS())
-    .pipe(rename({suffix: '.min'}))
-    .pipe(rev())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('./prodaction/css/'))
-    .pipe( rev.manifest() )
-    .pipe( gulp.dest( 'development/manifest/css/' ))
-    .pipe(browserSync.stream());
-     
-    callback();
+function css() {
+    return src('./development/sass/main.scss')
+        .pipe(sourcemaps.init())
+        .pipe(sass({
+            errorLogToConsole: true,
+            // outputStyle: 'compressed'
+        }))
+        .on('error', console.error.bind(console))
+        .pipe(autoprefixer(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true }))
+        .pipe(dest('./prodaction/css/'))
+        .pipe(minifyCSS())
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(rev())
+        .pipe(sourcemaps.write())
+        .pipe(dest('./prodaction/css/'))
+        .pipe(rev.manifest())
+        .pipe(dest('development/manifest/css/'))
+        .pipe(browserSync.stream());
 }
 
-gulp.task(cssProcessing);
+exports.css = css;
 
-function jsProcessing(callback){
-    gulp.src('./development/js/**/*.js')
-    .pipe(concat('all.js'))
-    .pipe(gulp.dest('./prodaction/js/'))
-    .pipe(rename({suffix: '.min'}))
-    .pipe(rev())
-    .pipe(uglify())
-    
-    .pipe(gulp.dest('./prodaction/js/'))
-    .pipe( rev.manifest() )
-    .pipe( gulp.dest( 'development/manifest/js/' ))
-    .pipe(browserSync.stream());
-    callback();
+
+function js() {
+    return src('./development/js/**/*.js')
+        .pipe(concat('all.js'))
+        .pipe(dest('./prodaction/js/'))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(rev())
+        .pipe(uglify())
+
+        .pipe(dest('./prodaction/js/'))
+        .pipe(rev.manifest())
+        .pipe(dest('development/manifest/js/'))
+        .pipe(browserSync.stream())
+
 }
 
-gulp.task(jsProcessing);
+exports.js = js;
 
+function img() {
+    return src('./development/images/**/*')
+        .pipe(imagemin([
+            imagemin.gifsicle({ interlaced: true }),
+            imagemin.jpegtran({ progressive: true }),
+            imagemin.optipng({ optimizationLevel: 5 }),
+            imagemin.svgo({
+                plugins: [
+                    { removeViewBox: true },
+                    { cleanupIDs: false }
+                ]
+            })
+        ]))
+        .pipe(dest('./prodaction/images/'))
 
-
-// gulp.task('revCollector', function () {
-//     return gulp.src(['development/manifest/**/*.json', 'development/templates/**/*.html'])
-//         .pipe( revCollector({
-//             replaceReved: true
-//         }))
-     
-//         .pipe( gulp.dest('dist') );
-// });
-
-
-
-function imageProcessing(callback){
-    gulp.src('./development/images/**/*')
-    .pipe(imagemin([
-        imagemin.gifsicle({interlaced: true}),
-        imagemin.jpegtran({progressive: true}),
-        imagemin.optipng({optimizationLevel: 5}),
-        imagemin.svgo({
-            plugins: [
-                {removeViewBox: true},
-                {cleanupIDs: false}
-            ]
-        })
-    ]))
-    .pipe(gulp.dest('./prodaction/images/'))
-
-    callback();
 }
 
-gulp.task(imageProcessing);
+exports.img = img;
 
-function htmlProcessing(callback){
 
-    gulp.src(['development/manifest/**/*.json', 'development/template/*.html'])
-    .pipe( revCollector({
-        replaceReved: true
-    
-    }))
-    .pipe( gulp.dest('development/template') )
 
-    gulp.src('./development/*.html')
-    .pipe(rigger())
-    .pipe(wiredep({
-        directory:"development/bower_components/main"
-       
-      }))
-    .pipe(gulp.dest('./prodaction'))
-    .pipe(browserSync.stream());
-    callback();
+
+function html() {
+
+    return src('./development/*.html')
+        .pipe(rigger())
+        .pipe(wiredep({
+            directory: "development/bower_components/main"
+
+        }))
+        .pipe(dest('./prodaction'))
+        .pipe(browserSync.stream());
+
 }
 
-gulp.task(htmlProcessing);
+exports.html = html;
+
+
+
+function revCollectorHtml() {
+
+    return src(['development/manifest/**/*.json', 'development/templates/**/*.html'])
+        .pipe(revCollector({
+            replaceReved: true
+        }))
+
+        .pipe(dest('dist'));
+
+}
+
+exports.revCollectorHtml = revCollectorHtml;
+
+exports.htmlProcessing = series(revCollectorHtml, html);
+
+
+function watcher() {
+    browserSync.init({
+        server: {
+            baseDir: "./prodaction"
+        },
+        port: 3000
+    });
+    watch("./development/sass/**/*",css);
+    // gulp.watch("./development/js/**/*",jsProcessing);
+    // gulp.watch("./development/images/**/*",imageProcessing);
+    // gulp.watch("./development/*.html",htmlProcessing);
+    // gulp.watch('bower.json',bowerProcessing);
+
+}
+
+exports.watcher = watcher;
+
 
 
 function cleaner() {
@@ -136,52 +148,32 @@ function cleaner() {
     });
 }
 
-function cleanProcessing(callback) {
-    gulp.src( ['./prodaction/css/*.*'], {read: false})
+
+
+function cleanProcessing() {
+    return src( ['./prodaction/css/*.*'], {read: false})
         .pipe( revOutdated(1) ) // leave 1 latest asset file for every file name prefix.
         .pipe( cleaner() )
-
-    callback();
 }
 
-gulp.task(cleanProcessing);
-
-function bowerProcessing(callback) {
-    gulp.src( 'prodaction/template/*.html')
-        .pipe(wiredep({
-        directory:"development/bower_components"
-      }))
-      .pipe(gulp.dest('development/template'));
-    callback();
-}
-
-gulp.task(bowerProcessing);
-
-function liveServer(callback) {
-    browserSync.init({
-        server: {
-            baseDir:"./prodaction"
-        },
-        port: 3000
-    });
-    callback();
-}
-
-gulp.task(liveServer);
-gulp.task('css', ['cssProcessing', 'htmlProcessing']);
-gulp.task('js', ['jsProcessing', 'htmlProcessing']);
-// gulp.task(css,gulp.series(cssProcessing,htmlProcessing));
-// gulp.task(js,gulp.series(jsProcessing,htmlProcessing));
-gulp.task('default', gulp.series(cssProcessing,jsProcessing,imageProcessing,htmlProcessing,bowerProcessing,watchProcessing));
-// gulp.task('default', gulp.parallel(liveServer,start));
+exports.cleanProcessing = cleanProcessing;
 
 
 
-function watchProcessing(){
-    gulp.watch("./development/sass/**/*",cssProcessing);
-    gulp.watch("./development/js/**/*",jsProcessing);
-    gulp.watch("./development/images/**/*",imageProcessing);
-    gulp.watch("./development/*.html",htmlProcessing);
-    gulp.watch('bower.json',bowerProcessing);
-}
+
+
+
+// function bowerProcessing(callback) {
+//     gulp.src( 'prodaction/template/*.html')
+//         .pipe(wiredep({
+//         directory:"development/bower_components"
+//       }))
+//       .pipe(gulp.dest('development/template'));
+//     callback();
+// }
+
+// gulp.task(bowerProcessing);
+
+
+
 

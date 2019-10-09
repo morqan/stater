@@ -19,9 +19,9 @@
   "devDependencies": {
     "browser-sync": "^2.26.7",
     "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^6.1.0",
+    "gulp-autoprefixer": "^7.0.1",
     "gulp-concat": "^2.6.1",
-    "gulp-imagemin": "^6.0.0",
+    "gulp-imagemin": "^6.1.1",
     "gulp-minify-css": "^1.2.4",
     "gulp-rename": "^1.4.0",
     "gulp-rev": "^9.0.0",
@@ -35,7 +35,7 @@
     "gulp-util": "^3.0.8",
     "gulp-wiredep": "^1.2.0",
     "path": "^0.12.7",
-    "rimraf": "^2.6.3",
+    "rimraf": "^3.0.0",
     "through2": "^3.0.1"
   },
   "dependencies": {
