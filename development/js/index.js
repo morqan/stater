@@ -1,3 +1,3 @@
 $ (function () {
-    console.log('worksxfg');
+    console.log('works all');
 });

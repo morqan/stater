@@ -1,5 +1,5 @@
 'use strict'
-const { gulp, src, dest, parallel, series,watch } = require('gulp');
+const { src, dest, parallel,watch } = require('gulp');
 
 const rename = require('gulp-rename');
 const sass = require('gulp-sass');
@@ -34,11 +34,11 @@ function css() {
         .pipe(dest('./prodaction/css/'))
         .pipe(minifyCSS())
         .pipe(rename({ suffix: '.min' }))
-        .pipe(rev())
+        // .pipe(rev())
         .pipe(sourcemaps.write())
         .pipe(dest('./prodaction/css/'))
-        .pipe(rev.manifest())
-        .pipe(dest('development/manifest/css/'))
+        // .pipe(rev.manifest())
+        // .pipe(dest('development/manifest/css/'))
         .pipe(browserSync.stream());
 }
 
@@ -50,12 +50,12 @@ function js() {
         .pipe(concat('all.js'))
         .pipe(dest('./prodaction/js/'))
         .pipe(rename({ suffix: '.min' }))
-        .pipe(rev())
+        // .pipe(rev())
         .pipe(uglify())
 
         .pipe(dest('./prodaction/js/'))
-        .pipe(rev.manifest())
-        .pipe(dest('development/manifest/js/'))
+        // .pipe(rev.manifest())
+        // .pipe(dest('development/manifest/js/'))
         .pipe(browserSync.stream())
 
 }
@@ -101,20 +101,44 @@ exports.html = html;
 
 
 
-function revCollectorHtml() {
+// function revCollectorHtml() {
 
-    return src(['development/manifest/**/*.json', 'development/templates/**/*.html'])
-        .pipe(revCollector({
-            replaceReved: true
-        }))
+//     return src(['development/manifest/**/*.json', 'development/templates/**/*.html'])
+//         .pipe(revCollector({
+//             replaceReved: true
+//         }))
 
-        .pipe(dest('dist'));
+//         .pipe(dest('./development/templates'));
 
-}
+// }
 
-exports.revCollectorHtml = revCollectorHtml;
+// exports.revCollectorHtml = revCollectorHtml;
 
-exports.htmlProcessing = series(revCollectorHtml, html);
+// function cleaner() {
+//     return through.obj(function(file, enc, cb){
+//         rimraf( path.resolve( (file.cwd || process.cwd()), file.path), function (err) {
+//             if (err) {
+//                 this.emit('error', new gutil.PluginError('Cleanup old files', err));
+//             }
+//             this.push(file);
+//             cb();
+//         }.bind(this));
+//     });
+// }
+
+
+
+// function cleanProcessing() {
+//     return src( ['./prodaction/css/*.*'], {read: false})
+//         .pipe( revOutdated(1) ) // leave 1 latest asset file for every file name prefix.
+//         .pipe( cleaner() )
+// }
+
+// exports.cleanProcessing = cleanProcessing;
+
+
+
+
 
 
 function watcher() {
@@ -125,9 +149,9 @@ function watcher() {
         port: 3000
     });
     watch("./development/sass/**/*",css);
-    // gulp.watch("./development/js/**/*",jsProcessing);
-    // gulp.watch("./development/images/**/*",imageProcessing);
-    // gulp.watch("./development/*.html",htmlProcessing);
+    watch("./development/js/**/*",js);
+    watch("./development/images/**/*",img);
+    watch("./development/*.html",html);
     // gulp.watch('bower.json',bowerProcessing);
 
 }
@@ -136,32 +160,11 @@ exports.watcher = watcher;
 
 
 
-function cleaner() {
-    return through.obj(function(file, enc, cb){
-        rimraf( path.resolve( (file.cwd || process.cwd()), file.path), function (err) {
-            if (err) {
-                this.emit('error', new gutil.PluginError('Cleanup old files', err));
-            }
-            this.push(file);
-            cb();
-        }.bind(this));
-    });
-}
+
+exports.default = parallel(css,js,img,html,watcher);
 
 
-
-function cleanProcessing() {
-    return src( ['./prodaction/css/*.*'], {read: false})
-        .pipe( revOutdated(1) ) // leave 1 latest asset file for every file name prefix.
-        .pipe( cleaner() )
-}
-
-exports.cleanProcessing = cleanProcessing;
-
-
-
-
-
+// gulp.task('default', gulp.parallel('build', 'watcher'));
 
 // function bowerProcessing(callback) {
 //     gulp.src( 'prodaction/template/*.html')
@@ -173,7 +176,3 @@ exports.cleanProcessing = cleanProcessing;
 // }
 
 // gulp.task(bowerProcessing);
-
-
-
-
