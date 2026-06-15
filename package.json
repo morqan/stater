@@ -1,44 +1,42 @@
 {
   "name": "stater",
-  "version": "1.0.0",
-  "description": "for a quick start  a new front project",
-  "main": "gulp.js",
-  "scripts": {
-    "test": "https://github.com/morqan/stater.git"
-  },
+  "version": "2.0.0",
+  "private": true,
+  "description": "Quick-start template for a new frontend project — Vite + React + TypeScript",
+  "type": "module",
+  "packageManager": "yarn@1.22.22",
+  "author": "Qurbanov Murad",
+  "license": "ISC",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/morqan/stater.git"
   },
-  "author": "Qurbanov Murad",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/morqan/stater/issues"
+  "engines": {
+    "node": ">=20.19"
   },
-  "homepage": "https://github.com/morqan/stater#readme",
-  "devDependencies": {
-    "browser-sync": "^2.26.7",
-    "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^7.0.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-imagemin": "^6.1.1",
-    "gulp-minify-css": "^1.2.4",
-    "gulp-rename": "^1.4.0",
-    "gulp-rev": "^9.0.0",
-    "gulp-rev-append": "^0.1.8",
-    "gulp-rev-collector": "^1.3.1",
-    "gulp-rev-outdated": "^1.0.1",
-    "gulp-rigger": "^0.5.8",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-uglify": "^3.0.2",
-    "gulp-util": "^3.0.8",
-    "gulp-wiredep": "^1.2.0",
-    "path": "^0.12.7",
-    "rimraf": "^3.0.0",
-    "through2": "^3.0.1"
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write ."
   },
   "dependencies": {
-    "wiredep": "^4.0.0"
-  }
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.17.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
+  },
+  "browserslist": [
+    "defaults",
+    "not dead"
+  ]
 }
