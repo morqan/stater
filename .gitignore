@@ -1,8 +1,21 @@
-
-# Dependency directories
+# Dependencies
 node_modules/
-prodaction/
 
+# Build output
+dist/
+*.local
 
+# Logs
+*.log
+logs/
 
+# Environment
+.env
+.env.*
+!.env.example
 
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

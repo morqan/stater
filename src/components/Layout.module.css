@@ -1,0 +1,22 @@
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.nav {
+  display: flex;
+  gap: 16px;
+}
+
+.main {
+  padding-block: 24px;
+}
