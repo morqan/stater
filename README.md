@@ -39,6 +39,16 @@ yarn dev          # start the dev server at http://localhost:5173
 | `yarn lint`      | Lint + format check with Biome                |
 | `yarn format`    | Auto-format the codebase with Biome           |
 
+## Quality gates
+
+Two automated layers keep `master` clean:
+
+- **Pre-commit hook** ([husky](https://typicode.github.io/husky) + [lint-staged](https://github.com/lint-staged/lint-staged)) —
+  on every `git commit`, Biome checks and auto-fixes the staged files. Installed automatically by
+  the `prepare` script on `yarn install`. Bypass once with `git commit --no-verify` if you must.
+- **CI** (GitHub Actions, `.github/workflows/ci.yml`) — on every push and pull request, runs
+  install → lint → typecheck → build on a clean runner. Can't be skipped.
+
 ## Project structure
 
 ```
