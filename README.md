@@ -82,4 +82,4 @@ test: { environment: 'jsdom', globals: true }
 
 ## Roadmap
 
-- [ ] GitHub Actions CI (install → lint → typecheck → build)
+- [x] GitHub Actions CI (install → lint → typecheck → build)
