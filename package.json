@@ -20,7 +20,11 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,jsonc,css}": "biome check --write --no-errors-on-unmatched"
   },
   "dependencies": {
     "react": "^19.2.7",
@@ -32,6 +36,8 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
+    "husky": "^9",
+    "lint-staged": "^15",
     "typescript": "^6.0.3",
     "vite": "^8.0.16"
   },
