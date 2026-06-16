@@ -1,5 +1,7 @@
 # stater
 
+[![CI](https://github.com/morqan/stater/actions/workflows/ci.yml/badge.svg)](https://github.com/morqan/stater/actions/workflows/ci.yml)
+
 A quick-start template for a new frontend project — **Vite + React + TypeScript**.
 
 Rebuilt in 2026 from the original 2019 Gulp + Bower boilerplate. One bundler (Vite)
@@ -48,6 +50,8 @@ Two automated layers keep `master` clean:
   the `prepare` script on `yarn install`. Bypass once with `git commit --no-verify` if you must.
 - **CI** (GitHub Actions, `.github/workflows/ci.yml`) — on every push and pull request, runs
   install → lint → typecheck → build on a clean runner. Can't be skipped.
+- **Dependency updates** ([Dependabot](https://docs.github.com/code-security/dependabot), `.github/dependabot.yml`) —
+  weekly grouped PRs for npm and GitHub Actions updates, each validated by CI.
 
 ## Project structure
 
